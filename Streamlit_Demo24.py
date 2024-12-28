@@ -27,3 +27,7 @@ if name:
 
 age = st.slider("Enter select your age: ", 10, 100,45)
 st.write("Your age is: ",age)
+
+list = ["python","C","Java"]
+choice = st.selectbox("choose your lang", list)
+st.write(f"your choice is {choice}")
