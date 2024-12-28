@@ -25,5 +25,5 @@ petal_width = st.sidebar.slider("petal Width", float(df['petal width (cm)'].min(
 input_data = [[sepal_length,sepal_width,petal_length,petal_width]]
 prediction = model.predict(input_data)
 predicted_species = target_names[prediction[0]]
-st.write(prediction)
-st.write(f"The predicted species is {predicted_species}")
+st.write("Prediction")
+st.write(f"The predicted species is: {predicted_species}")
