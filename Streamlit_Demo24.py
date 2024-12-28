@@ -31,3 +31,9 @@ st.write("Your age is: ",age)
 list = ["python","C","Java"]
 choice = st.selectbox("choose your lang", list)
 st.write(f"your choice is {choice}")
+
+uploaded_file = st.file_uploader("Please upload your file", type="csv")
+
+if uploaded_file is not None:
+    df = pd.read_csv(uploaded_file)
+    st.write(df)
