@@ -25,4 +25,4 @@ name = st.text_input("Please Enter Your Name: ")
 if name:
     st.write(f"Hello {name}")
 
-age = st.slider("Enter select your age: ", 10, 100)
+age = st.slider("Enter select your age: ", 10, 100,45)
