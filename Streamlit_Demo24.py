@@ -26,3 +26,4 @@ if name:
     st.write(f"Hello {name}")
 
 age = st.slider("Enter select your age: ", 10, 100,45)
+st.write("Your age is: ",age)
