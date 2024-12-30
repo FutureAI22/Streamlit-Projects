@@ -45,7 +45,7 @@ elif model_choice == "Linear Regression Model":
 
     @st.cache_data
     def load_regression_data():
-        file_name = 'Housing.xlsx'  # Ensure this file is in the same directory
+        file_name = './Housing.xlsx'  # Ensure this file is in the same directory
         housing_data = pd.ExcelFile(file_name)
         df = housing_data.parse('Housing')
         X = df.drop(columns=['price'])  # Changed 'Price' to 'price'
