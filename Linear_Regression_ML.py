@@ -1,27 +1,19 @@
 import streamlit as st
 import pandas as pd
 from sklearn.linear_model import LinearRegression
-from sklearn.preprocessing import LabelEncoder
 
-st.title("Housing Price Prediction App")
+st.title("Housing Price Prediction App (in USD)")
 
 @st.cache_data
 def load_and_prepare_data():
-    # Load the dataset
-    file_path = '/mnt/data/Housing.xlsx'
-    housing_data = pd.ExcelFile(file_path)
+    # Use the file name directly since it's in the same folder as the Python file
+    file_name = 'Housing.xlsx'
+    housing_data = pd.ExcelFile(file_name)
     df = housing_data.parse('Housing')
-    
-    # Encode categorical columns
-    categorical_cols = ['mainroad', 'guestroom', 'basement', 'hotwaterheating', 
-                        'airconditioning', 'prefarea', 'furnishingstatus']
-    encoders = {col: LabelEncoder() for col in categorical_cols}
-    for col in categorical_cols:
-        df[col] = encoders[col].fit_transform(df[col])
     
     # Separate features and target
     X = df.drop(columns=['price'])
-    y = df['price']
+    y = df['price']  # Price is already in USD
     
     return df, X, y
 
@@ -32,18 +24,46 @@ df, X, y = load_and_prepare_data()
 model = LinearRegression()
 model.fit(X, y)
 
-# Sidebar for input features
+# Sidebar for input features with explanations
 st.sidebar.title("Input Features")
+st.sidebar.write("""
+Adjust the following features to predict the house price in USD:
+- **Area**: Total area of the house in square feet.
+- **Bedrooms**: Number of bedrooms in the house.
+- **Bathrooms**: Number of bathrooms in the house.
+- **Stories**: Number of stories in the house.
+- **Main Road**: Whether the house is located on a main road (Yes = 1, No = 0).
+- **Guest Room**: Whether the house includes a guest room (Yes = 1, No = 0).
+- **Basement**: Whether the house has a basement (Yes = 1, No = 0).
+- **Hot Water Heating**: Whether the house has hot water heating (Yes = 1, No = 0).
+- **Air Conditioning**: Whether the house has air conditioning (Yes = 1, No = 0).
+- **Furnishing Status**: Furnishing status of the house (1 = Furnished, 2 = Semi-Furnished, 3 = Unfurnished).
+""")
+
 inputs = {}
-for col in X.columns:
-    if df[col].dtype == 'float64' or df[col].dtype == 'int64':
-        min_val = float(df[col].min())
-        max_val = float(df[col].max())
-        mean_val = float(df[col].mean())
-        inputs[col] = st.sidebar.slider(col, min_val, max_val, mean_val)
-    else:
-        options = df[col].unique()
-        inputs[col] = st.sidebar.selectbox(col, options)
+
+# Integer sliders for area, bedrooms, bathrooms, and stories
+inputs['area'] = st.sidebar.slider("Area (in sq. ft.)", int(df['area'].min()), int(df['area'].max()), int(df['area'].mean()))
+inputs['bedrooms'] = st.sidebar.slider("Bedrooms", int(df['bedrooms'].min()), int(df['bedrooms'].max()), int(df['bedrooms'].mean()))
+inputs['bathrooms'] = st.sidebar.slider("Bathrooms", int(df['bathrooms'].min()), int(df['bathrooms'].max()), int(df['bathrooms'].mean()))
+inputs['stories'] = st.sidebar.slider("Stories", int(df['stories'].min()), int(df['stories'].max()), int(df['stories'].mean()))
+
+# Binary inputs for mainroad, guestroom, basement, hotwaterheating, airconditioning
+binary_features = {
+    'mainroad-1': "Main Road (Yes = 1, No = 0)",
+    'guestroom-1': "Guest Room (Yes = 1, No = 0)",
+    'basement-1': "Basement (Yes = 1, No = 0)",
+    'hotwaterheating-1': "Hot Water Heating (Yes = 1, No = 0)",
+    'airconditioning-1': "Air Conditioning (Yes = 1, No = 0)"
+}
+for feature, description in binary_features.items():
+    inputs[feature] = st.sidebar.radio(description, (1, 0))
+
+# Dropdown for furnishingstatus
+inputs['furnishingstatus-1'] = st.sidebar.selectbox(
+    "Furnishing Status (1 = Furnished, 2 = Semi-Furnished, 3 = Unfurnished)",
+    [1, 2, 3]
+)
 
 # Convert inputs to DataFrame
 input_data = pd.DataFrame([inputs])
@@ -51,6 +71,6 @@ input_data = pd.DataFrame([inputs])
 # Make a prediction
 prediction = model.predict(input_data)
 
-# Display the prediction
+# Display the prediction in USD
 st.write("Prediction")
-st.write(f"The predicted price of the house is: ₹{prediction[0]:,.2f}")
+st.write(f"The predicted price of the house is: ${prediction[0]:,.2f} USD")
